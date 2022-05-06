@@ -1,32 +1,107 @@
----
-layout: null
----
-
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
-        xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    {% for post in site.posts %}
-    <url>
-        <loc>{{ site.url }}{{ post.url }}.html</loc>
-        {% if post.lastmod == null %}
-        <lastmod>{{ post.date | date_to_xmlschema }}</lastmod>
-        {% else %}
-        <lastmod>{{ post.lastmod | date_to_xmlschema }}</lastmod>
-        {% endif %}
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
 
-        {% if post.sitemap.changefreq == null %}
-        <changefreq>weekly</changefreq>
-        {% else %}
-        <changefreq>{{ post.sitemap.changefreq }}</changefreq>
-        {% endif %}
 
-        {% if post.sitemap.priority == null %}
-        <priority>0.5</priority>
-        {% else %}
-        <priority>{{ post.sitemap.priority }}</priority>
-        {% endif %}
+<url>
+  <loc>https://ga0-lee.github.io/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/categories/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/tags/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/archives/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/about/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/posts/getting-started/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/posts/enable-google-pv/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/posts/customize-the-favicon/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/posts/write-a-new-post/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/posts/text-and-typography/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/tags/favicon/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/tags/getting-started/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/tags/google-analytics/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/tags/pageviews/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/tags/typography/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/tags/writing/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/categories/blogging/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/categories/demo/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://ga0-lee.github.io/categories/tutorial/</loc>
+  <lastmod>2022-05-02T08:43:07+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
 
-    </url>
-    {% endfor %}
+
 </urlset>
