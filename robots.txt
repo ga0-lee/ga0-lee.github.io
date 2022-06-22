@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ga0-lee.github.io/sitemap.xml
