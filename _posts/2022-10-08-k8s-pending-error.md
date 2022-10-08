@@ -2,7 +2,7 @@
 title: AWS NLB로 배포한 K8s Service가 Pending 상태에서 지워지지 않는 문제
 author: garit
 date: 2022-10-08 11:00:00 +0900
-categories: [K8s, Error]
+categories: [Kubernetes, Error]
 tags: [k8s, aws]
 render_with_liquid: false
 ---
@@ -39,4 +39,4 @@ kubectl edit svc -n kube-system aws-load-balancer-service
 > 결과: 드디어 지워짐!!!      
 
 
-- 참고: https://stackoverflow.com/questions/61931602/cannot-delete-kubernetes-service-with-no-deployment
+- 참고: [https://stackoverflow.com/questions/61931602/cannot-delete-kubernetes-service-with-no-deployment](https://stackoverflow.com/questions/61931602/cannot-delete-kubernetes-service-with-no-deployment)
