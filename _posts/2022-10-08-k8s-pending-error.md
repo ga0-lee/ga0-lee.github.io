@@ -2,7 +2,7 @@
 title: AWS NLB로 배포한 K8s Service가 Pending 상태에서 지워지지 않는 문제
 author: garit
 date: 2022-10-08 11:00:00 +0900
-categories: [Kubernetes, Error]
+categories: [Kubernetes, Errors]
 tags: [k8s, aws]
 render_with_liquid: false
 ---
