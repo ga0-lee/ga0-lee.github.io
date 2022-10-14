@@ -9,7 +9,7 @@ render_with_liquid: false
 
 ## AWS NLB로 배포한 K8s Service가 Pending 상태에서 지워지지 않는 문제 해결 
 
-### 상황
+### 상 황
 
 AWS Load Balancer Controller를 사용하기 위해 Service를 LB 타입(AWS NLB)으로 배포하였으나, External IP가 생성되지 않으면서 Pending 상태에서 멈춰있음
 
