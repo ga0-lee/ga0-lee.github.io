@@ -20,7 +20,7 @@ EKS 노드그룹을 생성하면 해당 노드그룹의 Autoscaling을 담당하
 <br/>
 
 ### 해결방안
-1. Autoscaling Group의 종료 정책을 변경한다.  
+1.Autoscaling Group의 종료 정책을 변경한다.  
 <br/>
 기본적으로 Autoscaling Group의 종료 정책은 제일 먼저 생긴 즉, 제일 오래된 인스턴스부터 종료하게 되어있다.    
 <br/>
