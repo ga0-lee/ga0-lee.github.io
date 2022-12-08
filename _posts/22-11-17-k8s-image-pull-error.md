@@ -20,7 +20,7 @@ EKS Worker Node에 기존 ecr-test:0.1.2 버전의 이미지가 남아있었으�
 그래서 Pod는 ecr-test:0.1.2 버전의 이미지가 worker node의 docker에 있으므로 새로 ECR에서 pull 해오지 않고 예전에 pull 해왔던 기존 이미지를 사용하여 Pod를 배포했던 것이다.  
 
 ### 해결방안
-1. 먼저 Pod(또는 Deployment)의 yaml에 imagePullPolicy를 Always로 바꿔준다.  
+1.먼저 Pod(또는 Deployment)의 yaml에 imagePullPolicy를 Always로 바꿔준다.  
 
 ```yaml
 apiVersion: v1
@@ -38,13 +38,17 @@ spec:
 그러나 imagePullPolicy를 Always로 해준다고 해도 docker 이미지의 Digest 값이 같으면 다운로드를 시도는 하나 실제로 다운로드 하지 않는 현상이 있다고 한다.  
 그러므로 worker node에 pull 해온 이미지들을 주기적으로 지워줌으로써 이전 이미지를 계속 쓰는 일이 없도록 해야 할 것이다.  
 <br/>
-2. docker prune을 실행시키는 cron shell script를 사용하여 docker image를 주기적으로 지워준다.  
+2.docker prune을 실행시키는 cron shell script를 사용하여 docker image를 주기적으로 지워준다.  
 <br/>
 EKS의 경우 Worker Node가 생성될 때 Node Group의 시작템플릿에 cron shell을 생성하는 명령어를 추가해놓으면 worker node가 생성될 때마다 해당 shell도 함께 적용된다.  
 
 이미 사용하고 있는 시작템플릿이 있는 경우 새로운 버전을 생성하여 적용한다.  
 
 - EKS 콘솔 접속 -> 클러스터 -> 노드그룹 -> 시작템플릿 -> 작업 -> 템플릿 수정(새 버전 생성) -> 이미지 및 기본 설정들은 기존 버전과 동일하게 -> 제일 하단의 사용자데이터(User data)에 아래와 같이 입력 -> 템플릿 생성  
+
+<br/>
+
+
 ```bash
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
@@ -68,6 +72,7 @@ sudo echo "0 7 * * 1 bash docker image prune" > /etc/cron.weekly/cleaner_image.s
 
 --==MYBOUNDARY==--
 ```   
+
 <br/>
 
 템플릿을 새로 생성한 후 EKS 콘솔에서 시작템플릿 버전을 위에서 생성한 버전으로 변경한다.  
