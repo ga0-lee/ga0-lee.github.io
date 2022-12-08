@@ -25,7 +25,7 @@ EKS Worker Node에 기존 ecr-test:0.1.2 버전의 이미지가 남아있었으�
 <br/>
 
 ### 해결방안
-1.먼저 Pod(또는 Deployment)의 yaml에 imagePullPolicy를 Always로 바꿔준다.  
+**1.먼저 Pod(또는 Deployment)의 yaml에 imagePullPolicy를 Always로 바꿔준다.**  
 <br/>
 
 ```yaml
@@ -45,7 +45,8 @@ spec:
 <br/>
 그러므로 worker node에 pull 해온 이미지들을 주기적으로 지워줌으로써 이전 이미지를 계속 쓰는 일이 없도록 해야 할 것이다.  
 <br/>
-2.docker prune을 실행시키는 cron shell script를 사용하여 docker image를 주기적으로 지워준다.  
+
+**2.docker prune을 실행시키는 cron shell script를 사용하여 docker image를 주기적으로 지워준다.**  
 <br/>
 EKS의 경우 Worker Node가 생성될 때 Node Group의 시작템플릿에 cron shell을 생성하는 명령어를 추가해놓으면 worker node가 생성될 때마다 해당 shell도 함께 적용된다.  
 <br/>
