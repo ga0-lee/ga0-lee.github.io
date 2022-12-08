@@ -20,7 +20,7 @@ EKS 노드그룹을 생성하면 해당 노드그룹의 Autoscaling을 담당하
 <br/>
 
 ### 해결방안
-1.Autoscaling Group의 종료 정책을 변경한다.  
+**1.Autoscaling Group의 종료 정책을 변경한다.**  
 <br/>
 기본적으로 Autoscaling Group의 종료 정책은 제일 먼저 생긴 즉, 제일 오래된 인스턴스부터 종료하게 되어있다.    
 <br/>
@@ -30,7 +30,7 @@ EKS 노드그룹을 생성하면 해당 노드그룹의 Autoscaling을 담당하
 
 <br/>
 
-2.Autoscaling Group의 인스턴스 축소 보호를 설정한다.
+**2.Autoscaling Group의 인스턴스 축소 보호를 설정한다.**  
 - **인스턴스 축소 보호란**  
 : Auto Scaling 그룹에 대한 인스턴스 축소 보호 설정을 변경하여 축소 시 해당 Amazon EC2 Auto Scaling이 새 인스턴스를 종료할 수 있는지 여부를 제어할 수 있다.  
   축소 보호가 활성화된 경우 새로 시작된 인스턴스는 기본적으로 축소 보호되지만 이미 생성된 인스턴스들은 따로 설정을 해야한다.  
