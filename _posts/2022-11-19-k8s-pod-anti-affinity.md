@@ -40,84 +40,10 @@ affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution.weight 
 
 <예시>
 
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: test
-  name: test-deploy
-  namespace: test-ns
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: test
-  strategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        app: test
-    spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 10
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - test		
-          - weight: 50
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: type
-                  operator: In
-                  values:
-                  - nginx				  
-              topologyKey: "kubernetes.io/hostname"
-      containers:
-      - image: 123123123.dkr.ecr.ap-northeast-2.amazonaws.com/test:0.1.1
-        imagePullPolicy: Always
-        name: test-container
-        ports:
-        - containerPort: 8080
-          name: p-8080
-        envFrom:
-        - configMapRef:
-            name: test-configmap
-        resources:
-          requests:
-            memory: "1G"
-            cpu: "1"
-          limits:
-            memory: "1G"
-            cpu: "1"
-        livenessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 60
-        readinessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 60
-        volumeMounts:
-        - name: tz-config
-          mountPath: /etc/localtime
-      volumes:
-      - name: tz-config
-        hostPath:
-          path: /usr/share/zoneinfo/Asia/Seoul
-```
+
 <br/>
 
-* 주의: PodAffinity와 PodAntiAffinity에는 상당한 양의 프로세싱이 필요하기에 대규모 클러스터에서는 스케줄링 속도가 크게 느려질 수 있다. 수백 개의 노드를 넘어가는 클러스터에서 이를 사용하는 것은 추천하지 않는다.  
+- 주의: PodAffinity와 PodAntiAffinity에는 상당한 양의 프로세싱이 필요하기에 대규모 클러스터에서는 스케줄링 속도가 크게 느려질 수 있다. 수백 개의 노드를 넘어가는 클러스터에서 이를 사용하는 것은 추천하지 않는다.  
 <br/>
 
 <br/><br/>
