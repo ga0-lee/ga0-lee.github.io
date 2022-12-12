@@ -27,10 +27,14 @@ affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution.weight 
 <br/>
 
 예를 들어 preferredDuringSchedulingIgnoredDuringExecution 규칙을 만족하는 노드가 2개 있고, 하나에는 app: test 레이블이 있고 다른 하나에는 type: nginx 레이블이 있으면, 스케줄러는 각 노드의 weight를 확인한 뒤 weight가 더 작은 쪽에 Pod를 배포한다.  
+<br/>
+
 즉, app: test 레이블을 가진 pod-A가 배포된 node-A와 type: nginx 레이블을 가진 pod-B가 배포된 node-B가 있을 때 아래의 test-deploy는 가중치가 더 작은 app: test 레이블을 가진 pod-A가 배포된 node-A에 배포된다.  
 <br/>
 
 또한 podAntiAffinity에서는 노드에 일관된 레이블을 지정해야 한다.  
+<br/>
+
 즉, 클러스터의 모든 노드는 topologyKey 와 매칭되는 적절한 레이블을 가지고 있어야 한다. 일부 또는 모든 노드에 지정된 topologyKey 레이블이 없는 경우에는 의도하지 않은 동작이 발생할 수 있다.  
 <br/>
 
