@@ -37,3 +37,81 @@ affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution.weight 
 
 즉, 클러스터의 모든 노드는 topologyKey 와 매칭되는 적절한 레이블을 가지고 있어야 한다. 일부 또는 모든 노드에 지정된 topologyKey 레이블이 없는 경우에는 의도하지 않은 동작이 발생할 수 있다.  
 <br/>
+
+<예시>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test
+  name: test-deploy
+  namespace: test-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 10
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - test		
+          - weight: 50
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: type
+                  operator: In
+                  values:
+                  - nginx				  
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - image: 123123123.dkr.ecr.ap-northeast-2.amazonaws.com/test:0.1.1
+        imagePullPolicy: Always
+        name: test-container
+        ports:
+        - containerPort: 8080
+          name: p-8080
+        envFrom:
+        - configMapRef:
+            name: test-configmap
+        resources:
+          requests:
+            memory: "1G"
+            cpu: "1"
+          limits:
+            memory: "1G"
+            cpu: "1"
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 60
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 60
+        volumeMounts:
+        - name: tz-config
+          mountPath: /etc/localtime
+      volumes:
+      - name: tz-config
+        hostPath:
+          path: /usr/share/zoneinfo/Asia/Seoul
+```
