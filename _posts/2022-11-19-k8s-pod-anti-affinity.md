@@ -38,7 +38,7 @@ affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution.weight 
 즉, 클러스터의 모든 노드는 topologyKey 와 매칭되는 적절한 레이블을 가지고 있어야 한다. 일부 또는 모든 노드에 지정된 topologyKey 레이블이 없는 경우에는 의도하지 않은 동작이 발생할 수 있다.  
 <br/>
 
-<예시>
+- 예시
 
 ```yaml
 apiVersion: apps/v1
