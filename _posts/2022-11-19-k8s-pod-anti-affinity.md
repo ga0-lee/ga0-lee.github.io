@@ -115,3 +115,14 @@ spec:
         hostPath:
           path: /usr/share/zoneinfo/Asia/Seoul
 ```
+
+
+<br/>
+
+- 주의: PodAffinity와 PodAntiAffinity에는 상당한 양의 프로세싱이 필요하기에 대규모 클러스터에서는 스케줄링 속도가 크게 느려질 수 있다. 수백 개의 노드를 넘어가는 클러스터에서 이를 사용하는 것은 추천하지 않는다.  
+<br/>
+
+<br/><br/>
+
+참고
+- [https://kubernetes.io/ko/docs/concepts/scheduling-eviction/assign-pod-node/#more-practical-use-cases](https://kubernetes.io/ko/docs/concepts/scheduling-eviction/assign-pod-node/#more-practical-use-cases)
