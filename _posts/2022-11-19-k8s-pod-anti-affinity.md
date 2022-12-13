@@ -2,8 +2,8 @@
 title: K8s PodAntiAffinity로 Pod의 중복 배포를 최소화 하기
 author: garit
 date: 2022-11-19 12:40:00 +0900
-categories: [AWS, EKS]
-tags: [aws, eks]
+categories: [Kubernetes, Cases]
+tags: [k8s]
 render_with_liquid: false
 ---
 
