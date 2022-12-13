@@ -71,6 +71,7 @@ spec:
                   operator: In
                   values:
                   - test		
+              topologyKey: "kubernetes.io/hostname"                  
           - weight: 50
             podAffinityTerm:
               labelSelector:
@@ -107,13 +108,7 @@ spec:
             port: 8080
           initialDelaySeconds: 30
           periodSeconds: 60
-        volumeMounts:
-        - name: tz-config
-          mountPath: /etc/localtime
-      volumes:
-      - name: tz-config
-        hostPath:
-          path: /usr/share/zoneinfo/Asia/Seoul
+
 ```
 
 
