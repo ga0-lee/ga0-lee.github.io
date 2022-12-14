@@ -2,8 +2,8 @@
 title: K8s Pod 이미지 Pull 에러 해결방안
 author: garit
 date: 2022-11-17 10:40:00 +0900
-categories: [AWS, EKS]
-tags: [aws, eks, docker]
+categories: [Kubernetes, EKS]
+tags: [k8s, eks, docker]
 render_with_liquid: false
 ---
 
