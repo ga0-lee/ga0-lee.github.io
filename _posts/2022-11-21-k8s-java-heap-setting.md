@@ -43,8 +43,6 @@ data:
 <br/>
 
 > ex) Pod의 Resource Limits가 Memory 4G인 경우 Pod 실행을 위해 사용되는 memory 빼고 남는 memory 중 80인 약 3G 정도가 Heap Max 사이즈로 적용되었다.  
-
-- 로그 예시  
 ![heap](https://user-images.githubusercontent.com/67899732/209062330-4a2c46bc-2f81-43e4-bc25-6cd267bdfd67.png)
 
 
