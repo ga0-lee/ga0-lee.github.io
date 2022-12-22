@@ -2,7 +2,7 @@
 title: vim 에러 Cannot create backup file(add ! to overwrite) 해결하기
 author: garit
 date: 2022-11-15 10:00:00 +0900
-categories: [Linux, Cases]
+categories: [Linux]
 tags: [linux, vim]
 render_with_liquid: false
 ---
