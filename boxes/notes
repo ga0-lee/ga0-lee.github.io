@@ -1,0 +1,9 @@
+- k8s event 확인하기
+kubectl get events -n namespace명
+kubectl get events.events.k8s.io -n namespace명
+
+- pod가 재시작됐을 때 이전 pod의 container 로그 보기
+kubectl logs -n namespace명 pod명 -p=true
+kubectl logs -n namespace명 pod명 -previous=true
+
+- 
