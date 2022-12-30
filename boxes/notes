@@ -6,4 +6,7 @@ kubectl get events.events.k8s.io -n namespace명
 kubectl logs -n namespace명 pod명 -p=true
 kubectl logs -n namespace명 pod명 -previous=true
 
-- 
+- kubectl cp 명령어 에러 났을 때
+kubectl cp --no-preserve=true 하면 해결 됨
+또는
+kubectl cp namespace/podName:/tmp/file.txt ./  이런식으로 root를 포함하는 경우 에러가 나면 /tmp가 아니라 tmp/file.txt로 하면 된다.
