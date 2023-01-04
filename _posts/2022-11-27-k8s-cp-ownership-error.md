@@ -2,8 +2,8 @@
 title: kubectl cp 명령어 ownership 에러 해결하기
 author: garit
 date: 2022-11-27 10:00:00 +0900
-categories: [Nginx, Cases]
-tags: [nginx]
+categories: [Kubernetes, Cases]
+tags: [k8s]
 render_with_liquid: false
 ---
 
