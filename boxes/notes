@@ -10,3 +10,8 @@ kubectl logs -n namespace명 pod명 -previous=true
 kubectl cp --no-preserve=true 하면 해결 됨
 또는
 kubectl cp namespace/podName:/tmp/file.txt ./  이런식으로 root를 포함하는 경우 에러가 나면 /tmp가 아니라 tmp/file.txt로 하면 된다.
+
+- Kubernetes Event 생길 때마다 알람 보내주는 Messaging Bot 설치
+https://accordions.co.kr/it_trend/15172/
+  -  Botkube   ->  https://www.botkube.io/
+  - Kubewatch  ->   https://github.com/bitnami-labs/kubewatch
