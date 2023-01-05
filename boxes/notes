@@ -15,3 +15,8 @@ kubectl cp namespace/podName:/tmp/file.txt ./  이런식으로 root를 포함하
 https://accordions.co.kr/it_trend/15172/
   -  Botkube   ->  https://www.botkube.io/
   - Kubewatch  ->   https://github.com/bitnami-labs/kubewatch
+
+- nginx.conf port 안 막히게 하는 법
+  - proxy_http_version 1.1;
+  - proxy_set_header Connection "";
+  > 이 두 개를 추가해줘야 해당 server가 listen 하고 있는 port가 막히지 않는다.
