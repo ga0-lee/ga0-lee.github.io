@@ -1,0 +1,209 @@
+pipeline {
+    agent any
+
+    options {
+        timeout(time: 600, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '5', daysToKeepStr: '7'))
+    }
+
+    environment {
+        LC_ALL = 'ko_KR.UTF-8'
+        LANG = 'ko_KR.UTF-8'
+        LANGUAGE = 'ko_KR.UTF-8'         
+        APP_NAME = 'user-web'
+        registry = '420335378386.dkr.ecr.ap-northeast-2.amazonaws.com'
+        port = '443'
+        imageName = 'kbland-ecr-${APP_NAME}'
+        imageTag = "${params.APP_VER}"
+        argocd = 'kbfg-argocd.oksp.kbonecloud.com'
+        appName = 'bfm-02-stg-kbland-user-web'
+        cdRepo = 'bfm02-kbland-user-web-cd'        
+        
+        JIRA_FAIL_ON_ERROR = false
+        JIRA_PROJECT_KEY = 'B0BFM02'  // 지라 프로젝트의 '프로젝트 설정' - '세부사항' 에서 확인 가능
+        SERVICE_CODE = 'bfm02-kbland-user-web'  // 서비스 이름 (보통 repo 이름과 동일)
+    }
+
+    parameters {
+        string(name: 'APP_VER', defaultValue: "0.1.${BUILD_NUMBER}", description: '버전을 입력하세요\n예: 1.0.1')
+    }
+
+    stages {
+
+        stage('Jira Ticket Search'){
+            steps {
+                script{
+                    echo "--------------------"
+                    echo "[Jira Ticket Search]"
+                    echo "--------------------"
+                             
+                    searchIssue = jiraJqlSearch jql: 'project = '+JIRA_PROJECT_KEY+' and status not in ("Drop","개발 배포 완료","일반 배포 완료","긴급 릴리즈 완료","등록") and issuetype = 릴리즈 and summary ~ "'+SERVICE_CODE+'" and summary !~ "'+SERVICE_CODE+'-cd" ORDER BY updated DESC', maxResults: 1, site: 'dcjira'
+                             
+                    if(searchIssue.data.issues.isEmpty()) {
+                        echo "Jira Ticket does not exists."
+                        error "Pipeline abored due to JIRA ticket does not exists. (Project : ${JIRA_PROJECT_KEY} / Repository : ${SERVICE_CODE})"
+                    }
+                    else {
+                        JIRA_TICKET = searchIssue.data.issues[0].key
+                        echo "Complete JIRA ticket search."
+                    }
+                }
+            }
+        }
+        
+        stage('Checkout') {
+            steps {
+                echo 'Checkout'
+                git branch: 'stgmaster', credentialsId: 'cmadm', url: "http://bitbucket.kbonecloud.com/scm/b0bfm02/bfm02-kbland-user-web.git"
+                sh """
+                  mv ./nginx.conf_stag ./devops/docker/stag/
+                  ls -al devops/docker/stag/
+                  echo 'Hdycom1!!' > sparrow_passwd.txt
+               """
+            }
+        }
+
+        stage('Sonarqube(품질검사)') {
+			steps {
+				script {
+						echo "코드품질검사 수행"
+						beforeTm1 = sh(script:"date +%s",returnStdout: true).trim() as Integer
+						withSonarQubeEnv('KB SonarQube') {
+							sh """/fsutil/sonar-scanner-cli-4.5.0.2216-linux/bin/sonar-scanner '-Dsonar.projectKey=bfm02-kbland-user-web' '-Dsonar.projectBaseDir=$WORKSPACE' '-Dsonar.sources=src' '-Dsonar.java.binaries=build/classes'"""
+						}
+						
+
+						timeout(time:20, unit: 'MINUTES') {
+							qualitygate = waitForQualityGate(abortPipeline: true, webhookSecretId: 'bfm02-kbland-user-web')
+							
+							echo "========================================================================"
+							echo  "${qualitygate.status}"
+							echo "========================================================================"
+							
+							if (qualitygate.status != 'OK') {
+								jiraAddComment comment:  SERVICE_CODE + ' SonarQube 품질검사 : FAIL \n 결과확인 URL: http://b0-sonarqube.kbonecloud.com', idOrKey: JIRA_TICKET, site: 'dcjira'
+								echo "Sonarqube 룰 위반사항 검출"
+								error "Pipeline abored due to quality gate failure: ${qualitygate.status}"
+								build.doStop()
+							} else {
+                                jiraAddComment comment:  SERVICE_CODE + ' SonarQube 품질검사 : OK \n 결과확인 URL: http://b0-sonarqube.kbonecloud.com', idOrKey: JIRA_TICKET, site: 'dcjira'
+							    echo "Sonarqube 검사 완료"
+							}
+						}
+						beforeTm2 = sh(script:"date +%s",returnStdout: true).trim() as Integer
+					
+				}
+			}
+		} 
+
+ 		stage ('Sparrow(보안취약성)') {
+			steps {
+				script{
+						beforeTm1 = sh(script:"date +%s",returnStdout: true).trim() as Integer
+						
+						echo "보안 취약성 검사 수행"
+						sparrowTest = sh(script:'/fswas/sparrow5_client/sparrow-client.sh -P 5905634_bfm02-kbland-user-web -U 5905634 -PW sparrow_passwd.txt  -S https://10.140.254.44:18080 -SD ' + WORKSPACE, returnStdout: true)
+
+						def rstCount = sh(script:"echo \"${sparrowTest}\" | awk -F\'\n\' \'{if(\$1~/Total defects/) print}\' | awk -F\' \' \'{print \$NF}\'", returnStdout: true).trim()
+						
+						echo rstCount
+						
+						if (rstCount == '0'){
+						    jiraAddComment comment:  SERVICE_CODE + ' Sparrow 취약성 검사: OK \n', idOrKey: JIRA_TICKET, site: 'dcjira'
+						    echo "보안취약성 검사 완료 검출"
+						}
+						else{
+							jiraAddComment comment:  SERVICE_CODE + ' Sparrow 취약성 검사: FAIL \n', idOrKey: JIRA_TICKET, site: 'dcjira'
+							echo "보안취약사항 검출"
+							build.doStop()
+						}
+						beforeTm2 = sh(script:"date +%s",returnStdout: true).trim() as Integer
+				}
+			}
+		} 		
+
+        stage('Docker_Image_Build') {
+            steps {
+                    withAWS(credentials: 'stg-kbland', region: 'ap-northeast-2', endpointUrl: 'https://vpce-0872fcc97d19cdfc1-6ej5i45p.api.ecr.ap-northeast-2.vpce.amazonaws.com'){
+                        
+                        sh"""
+                          npm config set registry http://b0-nexus.kbonecloud.com/repository/npm-public/
+                          npm install -g yarn
+                          npm config set registry http://b0-nexus.kbonecloud.com/repository/bfm-npm-public/
+                          yarn config set registry http://b0-nexus.kbonecloud.com/repository/bfm-npm-public/
+						  
+						  yarn install  
+						  yarn run build:stg
+						  
+						  mv dist ./devops/docker/stag/
+						  ls -al ./devops/docker/stag/
+						  
+						  cd ./devops/docker/stag/						  
+						  
+                          aws configure list
+                          aws ecr get-login-password --region ap-northeast-2 --debug  --endpoint-url https://vpce-0872fcc97d19cdfc1-6ej5i45p.api.ecr.ap-northeast-2.vpce.amazonaws.com  | docker login --username AWS --password-stdin 420335378386.dkr.ecr.ap-northeast-2.amazonaws.com
+
+                          docker build --tag $registry/$imageName:$imageTag .
+                          docker push $registry/$imageName:$imageTag
+                          
+                        """
+                    }
+            }
+        }
+
+        stage('CD Repo Checkout') {
+            steps {
+                echo 'CD Repo Checkout'
+                withCredentials([usernameColonPassword(credentialsId: 'cmadm', variable: 'user')]) {
+                sh '''
+                    git clone http://${user}@bitbucket.kbonecloud.com/scm/b0bfm02/${cdRepo}.git -b stgmaster
+                    cd ${cdRepo}
+                    git config --global user.email admin@jenkins.com
+                    git config --global pull.rebase false
+                    git remote set-url origin http://${user}@bitbucket.kbonecloud.com/scm/b0bfm02/${cdRepo}.git
+                    sed -i "s/kbland-ecr-user-web:[0-9]*.[0-9]*.[0-9]*/kbland-ecr-user-web:${imageTag}/g" stg/bfm-kbland-user-web.yaml
+                    cat stg/bfm-kbland-user-web.yaml
+                    git commit -am "edit version ${imageTag}"
+                    git push origin stgmaster
+               '''
+                }
+            }
+        }
+       
+        stage('ArgoCD Deploy') {
+            steps {
+                 node('jenkins-slave-argocd') {
+                    withCredentials([string(credentialsId:"bfm-argocd", variable:"ARGOCD_AUTH_TOKEN")]) {
+                        sh "argocd app sync ${appName} --grpc-web --insecure --server ${argocd} --auth-token ${ARGOCD_AUTH_TOKEN}"
+                    }
+                }
+            }
+        }  		
+    }
+    post{
+          always
+          {
+           echo "--------------------------"
+           echo "always check"
+           echo "--------------------------"
+           
+           cleanWs()
+           
+           dir("${env.WORKSPACE}@tmp") {
+            deleteDir()
+           }
+        
+           dir("${env.WORKSPACE}@script") {
+            deleteDir()
+           }
+           
+           dir("${env.WORKSPACE}@script@tmp") {
+            deleteDir()
+           }
+           
+           sh "docker rmi -f $registry/$imageName:$imageTag"
+           
+          }
+    } 
+}
+
