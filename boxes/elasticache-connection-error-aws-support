@@ -5,8 +5,8 @@ AWS Support에 문의주셔서 감사합니다. 저는 오늘 고객님의 케�
 아래와 같은 에러메시지가 반환되며 연결에 실패하는 이슈를 겪고 계신 것으로 이해하였습니다.
 
 ```
-error : : Unable to connect to Redis; 
-nested exception is : Could not get a resource from the pool; 
+error : http://org.springframework.data.redis.RedisConnectionFailureException : Unable to connect to Redis; 
+nested exception is http://org.springframework.data.redis.connection.PoolException : Could not get a resource from the pool; 
 nested exception is io.lettuce.core.RedisConnectionException: Unable to connect to master.kbland-stg-redis.6ytibn.apn2.cache.amazonaws.com:6379
 ```
 
@@ -66,8 +66,8 @@ Redis 동작 상태와 관련하여 확인된 Metric 및 요약된 내역은 아
 이와 같은 이슈에 대해 내부적으로 조사해보았을 때, 사용하고 계시는 Application 및 Redis 클라이언트 라이브러리 레벨에서의 이슈일 가능성이 있는 것으로 확인됩니다.
 
 ```
-error : : Unable to connect to Redis; 
-nested exception is : Could not get a resource from the pool; -------> SpringFrameWork
+error : http://org.springframework.data.redis.RedisConnectionFailureException : Unable to connect to Redis; 
+nested exception is http://org.springframework.data.redis.connection.PoolException : Could not get a resource from the pool; -------> SpringFrameWork
 nested exception is io.lettuce.core.RedisConnectionException: Unable to connect to master.kbland-stg-redis.6ytibn.apn2.cache.amazonaws.com:6379 -------> Lettuce (Application Side Library)
 ```
 
@@ -86,14 +86,14 @@ spring.redis.ssl=true
 
 Spring Boot 및 Lettuce 설정과 관련하여 참고하실 수 있는 외부 링크를 아래에 첨부해드렸습니다.
 
-[+] 
-[+] 
-[+] 
+[+] https://www.baeldung.com/spring-data-redis-properties 
+[+] https://github.com/spring-projects/spring-boot/issues/24609 
+[+] https://stackoverflow.com/questions/13043658/could-not-get-a-resource-from-the-poolsockettimeoutexception 
 
 이와 더불어 application.yml 파일 상에는 Password 설정이 되어있고 Redis Config 상에서는 해당 설정에 대한 부분이 누락 되어있는 경우 
 동일한 에러가 발생할 수 있는 사례를 아래 링크에서 확인하실 수 있습니다.
 
-[+] 
+[+] https://velog.io/@myway00/Spring-Boot-%EB%8F%99%EC%8B%9C-%EC%A0%91%EC%86%8D-%EC%9C%A0%EC%A0%80%EC%88%98-%EC%A0%9C%ED%95%9Cfeat.Redis-%EC%84%B8%EC%85%98-2 
 
 ------------------------------------
 
@@ -105,25 +105,25 @@ Spring Boot 및 Lettuce 설정과 관련하여 참고하실 수 있는 외부 �
 
 참고자료:
 [1] CPUUtilization 
-
+https://ap-northeast-2.console.aws.amazon.com/cloudwatch/deeplink.js?region=ap-northeast-2#metricsV2:graph=~%28metrics~%28~%28~'AWS*2fElastiCache~'CPUUtilization~'CacheClusterId~'kbland-stg-redis-001%29%29~stat~'Maximum~period~'300~start~'2023-01-15T13*3a27*3a00.000Z~end~'2023-01-16T13*3a27*3a00.000Z~region~'ap-northeast-2%29 
 [2] EngineCPUUtilization 
-
+https://ap-northeast-2.console.aws.amazon.com/cloudwatch/deeplink.js?region=ap-northeast-2#metricsV2:graph=~%28metrics~%28~%28~'AWS*2fElastiCache~'EngineCPUUtilization~'CacheClusterId~'kbland-stg-redis-001%29%29~stat~'Maximum~period~'300~start~'2023-01-15T13*3a27*3a00.000Z~end~'2023-01-16T13*3a27*3a00.000Z~region~'ap-northeast-2%29 
 [3] FreeableMemory 
-
+https://ap-northeast-2.console.aws.amazon.com/cloudwatch/deeplink.js?region=ap-northeast-2#metricsV2:graph=~%28metrics~%28~%28~'AWS*2fElastiCache~'FreeableMemory~'CacheClusterId~'kbland-stg-redis-001%29%29~stat~'Average~period~'300~start~'2023-01-15T13*3a31*3a00.000Z~end~'2023-01-16T13*3a31*3a00.000Z~region~'ap-northeast-2%29 
 [4] CurrConnections
-
+https://ap-northeast-2.console.aws.amazon.com/cloudwatch/deeplink.js?region=ap-northeast-2#metricsV2:graph=~%28metrics~%28~%28~'AWS*2fElastiCache~'CurrConnections~'CacheClusterId~'kbland-stg-redis-001%29%29~stat~'Average~period~'300~start~'2023-01-15T13*3a33*3a00.000Z~end~'2023-01-16T13*3a33*3a00.000Z~region~'ap-northeast-2%29 
 [5] NewConnections 
-
+https://ap-northeast-2.console.aws.amazon.com/cloudwatch/deeplink.js?region=ap-northeast-2#metricsV2:graph=~%28metrics~%28~%28~'AWS*2fElastiCache~'NewConnections~'CacheClusterId~'kbland-stg-redis-001%29%29~stat~'Average~period~'300~start~'2023-01-15T13*3a33*3a00.000Z~end~'2023-01-16T13*3a33*3a00.000Z~region~'ap-northeast-2%29 
 [6] IsMaster 
-
+https://ap-northeast-2.console.aws.amazon.com/cloudwatch/deeplink.js?region=ap-northeast-2#metricsV2:graph=~%28metrics~%28~%28~'AWS*2fElastiCache~'IsMaster~'CacheClusterId~'kbland-stg-redis-001%29%29~stat~'Maximum~period~'60~start~'2023-01-15T13*3a34*3a00.000Z~end~'2023-01-16T13*3a34*3a00.000Z~region~'ap-northeast-2%29 
 [7] NetworkBytesIn/Out 
-
+https://ap-northeast-2.console.aws.amazon.com/cloudwatch/deeplink.js?region=ap-northeast-2#metricsV2:graph=~%28metrics~%28~%28~'AWS*2fElastiCache~'NetworkBytesIn~'CacheClusterId~'kbland-stg-redis-001~%28id~'m_9~visible~true~stat~'Sum~unit~'Bytes%29%29~%28~'AWS*2fElastiCache~'NetworkBytesOut~'CacheClusterId~'kbland-stg-redis-001~%28id~'m_10~visible~true~stat~'Sum%29%29%29~period~'60~start~'2023-01-15T13*3a35*3a00.000Z~end~'2023-01-16T13*3a35*3a00.000Z~region~'ap-northeast-2%29 
 [8] DatabaseMemoryUsagePercentage 
-
+https://ap-northeast-2.console.aws.amazon.com/cloudwatch/deeplink.js?region=ap-northeast-2#metricsV2:graph=~%28metrics~%28~%28~'AWS*2fElastiCache~'DatabaseMemoryUsagePercentage~'CacheClusterId~'kbland-stg-redis-001%29%29~stat~'Average~period~'300~start~'2023-01-15T14*3a15*3a00.000Z~end~'2023-01-16T14*3a15*3a00.000Z~region~'ap-northeast-2%29 
 [9] AWS Shared Responsibility Model 
-
+https://aws.amazon.com/compliance/shared-responsibility-model/ 
 [10] Data Privacy
-
+https://aws.amazon.com/compliance/data-privacy-faq/ 
 
 We value your feedback. Please share your experience by rating this and other correspondences in the AWS Support Center. You can rate a correspondence by selecting the stars in the top right corner of the correspondence.
 
