@@ -1,0 +1,38 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+
+--==MYBOUNDARY==
+
+cat <<EOF >> /etc/sysctl.conf			
+fs.file-max=3244429
+net.ipv4.tcp_window_scaling=1
+net.core.rmem_default=253952
+net.core.wmem_default=253952
+net.core.rmem_max=16777216
+net.core.wmem_max=16777216
+net.ipv4.tcp_rmem=253952 253952 16777216
+net.ipv4.tcp_wmem=253952 253952 16777216
+EOF
+
+cat <<EOF >> /etc/security/limits.conf
+*  soft  nofile  65535
+*  hard  nofile  65535
+EOF
+
+#!/bin/bash -xe
+EKS_REGION='ap-northeast-2'
+EKS_CLUSTER_NAME='kbland-ekcl-stg-ap'
+EKS_API_SERVER_ENDPOINT='https://3DE7A09AC695577C214148E3AB35D2A3.gr7.ap-northeast-2.eks.amazonaws.com'
+EKS_B64_CLUSTER_CA='LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeU1Ea3lNekExTVRNMU4xb1hEVE15TURreU1EQTFNVE0xTjFvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTUxQCi9lMHI1WVMwT0pRZlFXelpzMjhqcUljZE8zZHQyUHNXZmd6S1JFc3c0N2Npc1JKMURZSWxEcWRFYU1NOEVVR3cKMVpobVVwYjZKVEdGSFljSHY3YWd2RXZrSGFXby9Ya0RxQWpvUXY2Z2VKU2czWFowOVhWeEpScDZMWU1QcHBTUwpsRHowU0tpSGRiV1F5bktpc2FqOGd5L2lLT0JLSGJPcEFjSGNNOGcvb01oOU5hbllmSDF2RVkwSGk5M0lodEVUCkJxU2VWaktuTjQwSTl0MXFiOTNZMVFZc0NZeURTMUlraHJBTCt0a0wrSEtKUC9wOWI4eVhnM2kzNnlYZ1NCTUIKeFN4Z0JJR1RoZi9POS9mcFczK0g1cEpIZERUWGdkRXNEMXdwTU5HT1dENW9HMUg1Y01uc1NsZi9kZ05ZS2RUUApMWXNpcXFYVTIxQ3FudDQ4aCtzQ0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZEUjhnMGFCSWE2QUVwOEt1VkxGOVp2K2pvbHlNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFBVEVTYmV0TGxOYmpnaVp5VzIxaUtrWXJyM1loZ2tyTWJNdXhSUFNnS0FsQXhtdTgyUwp2ZENYdGFCbHRCMExMYy9nNDdqQ2lpZTJzbnBMaU1HYU96R1ZvYnFIY0lDRkdwcllHdy9MSkhvOTRHODlsV1piCkdQQ1ZmUGV3cWVkUWdTL2JxM2VwMUJETlRhb2tNc3k2SGpBZVR6ZStXL2RuTFdMYjBISzJWY1p5TUlkWmNoVjEKdU5JZmxTWGtJalpvVnRWdmNJa0tjdjJuU3dTamxRNFdPOEs5bXB0ano1M2ZjckRhakNRUmxiZVdiTStMdC9WaQpLT1J1MkNGc1MvYlEwNFVIT2xOQTNyS0NvN3E0bWI0RlY4OW83WVl6STIweFp3NExMQlZSamYvZzNFeDVlbklPClZpNjZWTk04MkI4am10bkU0Q0dIRzlZZ3hjUlZIdVRyd1pDKwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=='
+## Settings the node group labels
+/etc/eks/bootstrap.sh \
+  --apiserver-endpoint $EKS_API_SERVER_ENDPOINT \
+  --b64-cluster-ca $EKS_B64_CLUSTER_CA \
+  --kubelet-extra-args '--node-labels=node-type=self,ng=kbland-ekcl-stg-ap' \
+  $EKS_CLUSTER_NAME
+
+## Settings the timezone
+sudo timedatectl set-timezone Asia/Seoul
+sudo echo "0 7 * * 1 bash docker image prune" > /etc/cron.weekly/cleaner_image.sh && chmod +x /etc/cron.weekly/cleaner_image.sh
+
+--==MYBOUNDARY==--

@@ -1,0 +1,171 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bfm-kbland-admin-price
+  name: bfm-kbland-admin-price-deploy
+  namespace: kbland-ns-ap
+spec:
+  replicas: 12
+  selector:
+    matchLabels:
+      app: bfm-kbland-admin-price
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: bfm-kbland-admin-price
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - bfm-kbland-admin-price
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - image: 420335378386.dkr.ecr.ap-northeast-2.amazonaws.com/kbland-ecr-admin-price:0.1.87
+        imagePullPolicy: Always
+        name: bfm-kbland-admin-price-container
+        ports:
+        - containerPort: 8080
+          name: p-8080
+        envFrom:
+        - configMapRef:
+            name: bfm-kbland-admin-price-configmap
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "100m"
+          limits:
+            memory: "5856Mi"
+            cpu: "16"
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 60
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 60
+        volumeMounts:
+        - mountPath: /fsdata
+          name: ap-fsdata
+        - mountPath: /fsconfig/damo
+          name: ap-fsconfig
+        - name: tz-config
+          mountPath: /etc/localtime
+      volumes:
+      - name: ap-fsdata
+        persistentVolumeClaim:
+          claimName: kbland-ekcl-stg-ap-efs-fsdata
+      - name: ap-fsconfig
+        persistentVolumeClaim:
+          claimName: kbland-ekcl-stg-ap-efs-fsconfig
+      - name: tz-config
+        hostPath:
+          path: /usr/share/zoneinfo/Asia/Seoul
+      hostAliases:
+      - ip: "10.141.79.56"
+        hostnames:
+        - "accounts.google.com"
+        - "oauth2.googleapis.com"
+        - "www.googleapis.com"
+        - "fcm.googleapis.com"
+      - ip: "10.141.78.44"
+        hostnames:
+        - "accounts.google.com"
+        - "oauth2.googleapis.com"
+        - "www.googleapis.com"
+        - "fcm.googleapis.com"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bfm-kbland-admin-price-configmap
+  namespace: kbland-ns-ap
+data:
+  TZ: Asia/Seoul
+  JAVA_OPT: "-Dspring.profiles.active=stg -Djennifer.config=/kb/jennifer/agent.java/conf/jennifer_stg.conf -javaagent:/kb/jennifer/agent.java/jennifer.jar -Duser.timezone=Asia/Seoul"
+  HEAP_OPT: "-XshowSettings:vm -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/fsdata/heap_dump/${HOSTNAME}.hprof"
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: bfm-kbland-admin-price-hpa
+  namespace: kbland-ns-ap
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: bfm-kbland-admin-price-deploy
+  minReplicas: 12
+  maxReplicas: 18
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 800
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: Service=kbland,
+      Name=bfm-kbland-outbound-gateway-nlb
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:ap-northeast-2:420335378386:certificate/d946508a-ec86-408f-ba24-5d39aa0f6ce2
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
+    service.beta.kubernetes.io/aws-load-balancer-subnets: subnet-007c944565d3ae62f,
+      subnet-068dc282b4481b612
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  name: bfm-kbland-outbound-gateway-svc
+  namespace: kbland-ns-fr
+spec:
+  clusterIP: 172.20.137.237
+  clusterIPs:
+  - 172.20.137.237
+  externalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http80
+    nodePort: 30002
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  - name: https
+    nodePort: 31404
+    port: 443
+    protocol: TCP
+    targetPort: 8080
+  - name: http8082
+    nodePort: 32540
+    port: 8082
+    protocol: TCP
+    targetPort: 8082
+  - name: http8083
+    nodePort: 30954
+    port: 8083
+    protocol: TCP
+    targetPort: 8083
+  selector:
+    app: bfm-kbland-outbound-gateway
+  sessionAffinity: None
+  type: LoadBalancer
+
+

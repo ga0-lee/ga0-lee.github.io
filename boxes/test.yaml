@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test
+  name: test-deploy
+  namespace: test-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - test
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - image: 666763412262.dkr.ecr.ap-northeast-2.amazonaws.com/kbland-ecr-lots:0.1.42
+        imagePullPolicy: Always
+        name: test-container
+        ports:
+        - containerPort: 8080
+          name: p-8080
+        envFrom:
+        - configMapRef:
+            name: test-configmap
+        resources:
+          requests:
+            memory: "1G"
+            cpu: "1"
+          limits:
+            memory: "1G"
+            cpu: "1"
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 60
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 60
+        volumeMounts:
+        - mountPath: /fsdata
+          name: ap-fsdata
+        - mountPath: /fsconfig/damo
+          name: ap-fsconfig
+        - name: tz-config
+          mountPath: /etc/localtime
+      volumes:
+      - name: ap-fsdata
+        persistentVolumeClaim:
+          claimName: kbland-ekcl-dev-ap-efs-fsdata
+      - name: ap-fsconfig
+        persistentVolumeClaim:
+          claimName: kbland-ekcl-dev-ap-efs-fsconfig
+      - name: tz-config
+        hostPath:
+          path: /usr/share/zoneinfo/Asia/Seoul
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-configmap
+  namespace: test-ns
+data:
+  TZ: Asia/Seoul
+  JAVA_OPT: "-Dspring.profiles.active=dev -Duser.timezone=Asia/Seoul"
+  HEAP_OPT: "-XshowSettings:vm"
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: test-hpa
+  namespace: test-ns
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: test-deploy
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+
