@@ -1,0 +1,178 @@
+collabee_charlie [ ~/workspace/dind ]$ k get pod -n jenkins -o yaml
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/restartedAt: "2023-02-24T02:29:34Z"
+    creationTimestamp: "2023-02-27T03:04:30Z"
+    generateName: jenkins-server-deploy-bd76b785b-
+    labels:
+      app: jenkins-server
+      pod-template-hash: bd76b785b
+    name: jenkins-server-deploy-bd76b785b-bmwmk
+    namespace: jenkins
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: jenkins-server-deploy-bd76b785b
+      uid: 7f24a97b-2ba2-40e2-be1b-244069fdc96d
+    resourceVersion: "36991351"
+    uid: 37432273-7c63-4452-a15d-8cb376747084
+  spec:
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - preference:
+            matchExpressions:
+            - key: kubernetes.azure.com/mode
+              operator: In
+              values:
+              - system
+          weight: 100
+    containers:
+    - command:
+      - dockerd
+      - --host
+      - tcp://127.0.0.1:2375
+      image: docker:dind
+      imagePullPolicy: Always
+      name: dind
+      resources: {}
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/lib/docker
+        name: launcher-storage
+        subPath: docker
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-22n9b
+        readOnly: true
+    - env:
+      - name: DOCKER_HOST
+        value: tcp://localhost:2375
+      - name: JAVA_OPTS
+        value: -Duser.timezone=Asia/Seoul
+      image: jenkins/jenkins:lts-jdk11
+      imagePullPolicy: IfNotPresent
+      name: jenkins-server
+      ports:
+      - containerPort: 8080
+        name: http-port
+        protocol: TCP
+      - containerPort: 50000
+        name: jnlp-port
+        protocol: TCP
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/jenkins_home
+        name: jenkins-server-pvc
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-22n9b
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    imagePullSecrets:
+    - name: registry-secret
+    nodeName: aks-systempool01-42296123-vmss000001
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 1000
+      runAsUser: 0
+    serviceAccount: jenkins-admin
+    serviceAccountName: jenkins-admin
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: jenkins-server-pvc
+      persistentVolumeClaim:
+        claimName: jenkins-server-pvc
+    - emptyDir: {}
+      name: launcher-storage
+    - name: kube-api-access-22n9b
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2023-02-27T03:04:30Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2023-02-27T03:04:39Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2023-02-27T03:04:39Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2023-02-27T03:04:30Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://658d98be041a3603cefd2c43cf317cbe1a0b6bb4427544da2ea208b4aff034c5
+      image: docker.io/library/docker:dind
+      imageID: docker.io/library/docker@sha256:3cf33ff6e893a39262bd9f6b85ff46e068fa2a98d201326e9c3058a22a21a6bb
+      lastState: {}
+      name: dind
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2023-02-27T03:04:38Z"
+    - containerID: containerd://c74418222468b77ef1bb0fe4aab219347a9bd472ec728c8f8adf94b905930825
+      image: docker.io/jenkins/jenkins:lts
+      imageID: docker.io/jenkins/jenkins@sha256:8656eb80548f7d9c7be5d1f4c367ef432f2dd62f81efa86795c9155258010d99
+      lastState: {}
+      name: jenkins-server
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2023-02-27T03:04:38Z"
+    hostIP: 10.224.0.14
+    phase: Running
+    podIP: 10.244.10.47
+    podIPs:
+    - ip: 10.244.10.47
+    qosClass: BestEffort
+    startTime: "2023-02-27T03:04:30Z"
+kind: List
+metadata:
+  resourceVersion: ""
