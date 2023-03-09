@@ -40,11 +40,11 @@ Jenkins Pipeline을 Git Webhook과 연동하여 git tag가 생성되었을 때 J
 이제 위에서 생성한 Jenkins Job을 자동으로 실행시킬 Webhook을 설정한다.  
 <br/>
 
-> #설정 방법
+> #설정 방법  
 > Repository 접속 -> Settings -> Webhooks -> Add webhook -> Payload URL에 위에서 수정한 빌드 유발 URL을 입력한다 (http://User이름:Token값@Jenkins주소/view/Papyrus-build/job/dev-messenger-front/buildWithParameters?token=Tokens이름) -> Content type: application/json -> Which events would you like to trigger this webhook? (어떤 이벤트로 빌드를 실행시킬 건지 선택): Let me select individual events.에서 Branch or tag creation(branch나 tag가 생성될 때) 선택 -> Active는 활성화 -> Add webhook 
 <br/>
 
-> #webhook 결과 확인 방법
+> #webhook 결과 확인 방법  
 > Webhooks 페이지 -> 위에서 생성한 webhook 선택 -> Recent Deliveries 클릭 -> 여기서 webhook의 성공/실패 여부를 확인할 수 있다.
 > 에러가 발생하는 경우 설정을 변경하고 Redeliver를 클릭하여 재시도 해볼 수 있다.
 <br/>
@@ -66,7 +66,7 @@ Jenkins Pipeline을 Git Webhook과 연동하여 git tag가 생성되었을 때 J
 ### Webhook으로 빌드 Trigger 되는지 테스트하기
 
 git tag를 생성하여 webhook을 동작시켜 젠킨스 빌드를 실행한다.  
-<br/>
+
 
 ```bash
 # git tag 생성
@@ -76,7 +76,6 @@ git push origin test-0.1
 ```
 
 - 위 명령어로 tag를 생성하면 webhook이 동작하며 젠킨스 빌드가 실행된다.  
-<br/>
 
 - 아래 화면은 webhook이 tag create로 동작했다는 것을 보여준다.  
 
