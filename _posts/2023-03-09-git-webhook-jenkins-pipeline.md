@@ -53,7 +53,6 @@ Jenkins Pipeline을 Git Webhook과 연동하여 git tag가 생성되었을 때 J
 - 처음 발생한 403에러는 403 Forbidden 에러였는데 이건 Jenkins 방화벽 설정 때문에 발생한 에러였다.  
     내 경우에는 K8s에 Pod로 젠킨스를 사용 중이었고, Nginx Ingress Controller를 사용하여 라우팅 설정을 했다.  
     그래서 아래와 같이 annotation에 Github의 webhook ip range를 whitelist에 추가해주면 된다.  
-<br/>
 
 - Git IP 확인: https://api.github.com/meta
 > webhook IP: 192.30.252.0/22,185.199.108.0/22,140.82.112.0/20,143.55.64.0/20
