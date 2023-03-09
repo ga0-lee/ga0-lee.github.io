@@ -45,7 +45,7 @@ Jenkins Pipeline을 Git Webhook과 연동하여 git tag가 생성되었을 때 J
 <br/>
 
 > #webhook 결과 확인 방법  
-> Webhooks 페이지 -> 위에서 생성한 webhook 선택 -> Recent Deliveries 클릭 -> 여기서 webhook의 성공/실패 여부를 확인할 수 있다.
+> Webhooks 페이지 -> 위에서 생성한 webhook 선택 -> Recent Deliveries 클릭 -> 여기서 webhook의 성공/실패 여부를 확인할 수 있다.  
 > 에러가 발생하는 경우 설정을 변경하고 Redeliver를 클릭하여 재시도 해볼 수 있다.
 <br/>
 
