@@ -31,7 +31,7 @@ Jenkins Pipeline을 Git Webhook과 연동하여 git tag가 생성되었을 때 J
 <br/> 
 
 - 위에서 따로 저장한 빌드 유발 URL을 다음과 같이 수정한다.
-> http://User이름:Token값@Jenkins주소/view/Papyrus-build/job/dev-messenger-front/buildWithParameters?token=Tokens이름
+> http://User이름:Token값@Jenkins주소/view/Papyrus-build/job/dev-messenger-front/buildWithParameters?token=Tokens이름  
 > 예시) http://admin:1231313213@test.jenkins.co/view/Papyrus-build/job/dev-messenger-front/buildWithParameters?token=webhook
 <br/> 
 
